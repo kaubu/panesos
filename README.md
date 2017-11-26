@@ -10,5 +10,9 @@ A terminal based "operating system"
 * There is a default administrator on there already, username and password are `admin`
 
 # Changelog
+## v0.2
+* Added the ability to change password, and delete accounts
+* Bug fixes, improvements
+
 ## v0.1
 * Initial Build
