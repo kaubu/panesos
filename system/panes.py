@@ -5,12 +5,16 @@
 import gvars
 import handler
 from sys import argv
+from os import system
 
 # Variables
 new_launch = True
+raw_errors = False
 
 # Functions
 def main():
+	system("title PanesOS v{}".format(gvars.version))
+
 	global new_launch
 
 	try:
@@ -37,11 +41,13 @@ def main():
 	while True:
 		chand.refresh()
 
-		try:
-			chand.process(input("> "))
+		if raw_errors: chand.process(input("> "))
+		else:
+			try:
+				chand.process(input("> "))
 
-		except Exception as error:
-			if gvars.allow_errors: print(error)
+			except Exception as error:
+				if gvars.allow_errors: print(error)
 
 # Main
 if __name__ == "__main__":
