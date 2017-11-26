@@ -1,10 +1,8 @@
 # PanesOS  
 A terminal based "operating system"  
 
-# Features
-* Can create an account
-* Can autheticate with that account
-* Encrypts user passwords with bcrypt
+# Prerequisites
+* You must have the bcrypt module installed, to install it do `pip install bcrypt` in your console
 
 # Notes
 * There is a default administrator on there already, username and password are `admin`
