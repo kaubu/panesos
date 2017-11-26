@@ -8,3 +8,7 @@ A terminal based "operating system"
 
 # Notes
 * There is a default administrator on there already, username and password are `admin`
+
+# Changelog
+## v0.1
+* Initial Build
