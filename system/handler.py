@@ -59,10 +59,11 @@ def pub_create():
 
 	else:
 		dt = datetime.now()
-		new_make_date = "{} {} {} - {} {} {}".format(dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second)
+		new_make_date = "{}-{}-{} - {}:{}:{}h".format(dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second)
+		new_change_date = "{}-{}-{} - {}:{}:{}h".format(dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second)
 
 		print("Creating the user...")
-		users[new_username] = [new_display_name, new_password, new_make_date]
+		users[new_username] = [new_display_name, new_password, new_make_date, new_change_date] # Second date it password reset date
 
 		with open(gvars.user_database, "wb") as file:
 			dump(users, file)
@@ -88,8 +89,68 @@ def pub_login():
 
 	silent_update()
 
+def pub_chpwd():
+	users = cache_credentials()
+
+	try_username = input("Username: ")
+	try_password = b64encode(sha256(getpass("Existing Password: ").encode("utf-8")).digest())
+	new_password = hash_password(getpass("New Password: ").encode("utf-8"))
+
+	dt = datetime.now()
+	new_change_date = "{}-{}-{} - {}:{}:{}h".format(dt.day, dt.month, dt.year, dt.hour, dt.minute, dt.second)
+
+	if check_user(try_username):
+		hashed_password = users.get(try_username)[1]
+
+		if checkpw(try_password, hashed_password):
+			if not checkpw(try_password, new_password):
+				old_user = users[try_username]
+				users[try_username] = [old_user[0], new_password, old_user[2], new_change_date]
+
+				with open(gvars.user_database, "wb") as file:
+					dump(users, file)
+
+				print(gvars.password_changed)
+
+			else: print(gvars.same_pass_error)
+
+		else: print(gvars.auth_fail_msg)
+
+	else:
+		print(gvars.auth_fail_msg)
+
+	silent_update()
+
+def pub_rmusr():
+	users = cache_credentials()
+
+	try_username = input("Username: ")
+	try_password = b64encode(sha256(getpass("Password: ").encode("utf-8")).digest())
+
+	if check_user(try_username):
+		hashed_password = users.get(try_username)[1]
+
+		if checkpw(try_password, hashed_password):
+			users.pop(try_username, None)
+
+			with open(gvars.user_database, "wb") as file:
+				dump(users, file)
+
+			print(gvars.account_removed)
+
+		else: print(gvars.auth_fail_msg)
+
+	else:
+		print(gvars.auth_fail_msg)
+
+	silent_update()
+
 def pub_clear():
 	system("cls")
+
+def pub_reset():
+	pub_clear()
+	print(gvars.welcome_msg)
 
 def pub_exit():
 	exit()
@@ -109,6 +170,28 @@ def prv_users():
 	print("Format:\n[Username - Display Name]")
 	for k, v in users.items():
 		print("{} - {}".format(k, v[0]))
+
+def prv_info():
+	users = cache_credentials()
+
+	try_username = input("Username: ")
+
+	if check_user(try_username):
+		user_info = users[try_username]
+		print("User Info for {}\nUsername (Logon Name): {}\nDisplay Name: {}\nAccount Made: {}\nPassword Last Set: {}".format(try_username, try_username, user_info[0], user_info[2], user_info[3]))
+
+	else: print(gvars.username_error)
+
+def prv_retrievehash():
+	users = cache_credentials()
+
+	try_username = input("Username: ")
+
+	if check_user(try_username):
+		user_info = users[try_username]
+		print(user_info[1])
+
+	else: print(gvars.username_error)
 
 # Classes
 class handler:
